@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 async function connectToDatabase() {
-  // await mongoose.connect(
-  // "mongodb+srv://iqlipse22:Uprvmz9ikr@cluster0.xkqjppx.mongodb.net/?retryWrites=true&w=majority/levitation",
-  // {
-  await mongoose.connect("mongodb://localhost:27017/levitation", {
+  await mongoose.connect(
+  "mongodb+srv://iqlipse22:Uprvmz9ikr@cluster0.xkqjppx.mongodb.net/?retryWrites=true&w=majority/levitation",
+  {
+  // await mongoose.connect("mongodb://localhost:27017/levitation", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
