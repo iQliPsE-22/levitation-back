@@ -211,70 +211,103 @@ server.post("/generate-invoice", async (req, res) => {
       <head>
         <style>
           body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-          .container { max-width: 960px; margin: auto; padding: 20px; }
-          .header { display: flex; justify-content: space-between; align-items: center; }
-          .header h1 { margin: 0; }
-          .header img { height: 40px; }
-          .invoice-details { margin-top: 20px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          .max-w-4xl { max-width: 960px; margin: auto; padding: 20px; }
+          .flex { display: flex; }
+          .items-center { align-items: center; }
+          .justify-between { justify-content: space-between; }
+          .text-left { text-align: left; }
+          .text-right { text-align: right; }
+          .mt-8 { margin-top: 2rem; }
+          .h-10 { height: 2.5rem; }
+          .w-10 { width: 2.5rem; }
+          .text-xl { font-size: 1.25rem; }
+          .text-2xl { font-size: 1.5rem; }
+          .font-bold { font-weight: bold; }
+          .text-gray-500 { color: #6B7280; }
+          .bg-white { background-color: #fff; }
+          .bg-gray-800 { background-color: #333; }
+          .text-white { color: #fff; }
+          .text-blue-600 { color: #2563EB; }
+          .rounded-md { border-radius: 0.375rem; }
+          table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
           th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
           th { background-color: #f2f2f2; }
-          .total { text-align: right; margin-top: 20px; }
-          .terms { margin-top: 20px; padding: 20px; background-color: #333; color: white; border-radius: 8px; }
-          .terms p { margin: 0; }
-          .terms .title { font-weight: bold; }
-          .text-right { text-align: right; }
+          p { margin: 0; }
         </style>
       </head>
       <body>
-        <div class="container">
-          <div class="header">
-            <div>
-              <h1>INVOICE</h1>
+        <div class="max-w-4xl">
+          <div class="flex items-center justify-between">
+            <div class="text-left">
+              <h1 class="text-xl font-bold">INVOICE</h1>
             </div>
-            <div class="logo">
-              <img src="cid:logo.png" alt="levitation">
+            <div class="flex items-center mt-8">
+              <img src="cid:logo.png" class="h-10 w-10" alt="levitation">
               <div>
-                <h2>levitation</h2>
-                <p class="text-gray-500">infotech</p>
+                <h2 class="text-2xl font-bold">levitation</h2>
+                <p class="text-gray-500 text-right">infotech</p>
               </div>
             </div>
           </div>
-          <div class="invoice-details">
-            <table>
-              <thead>
+          <table class="bg-white">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${cart
+                .map(
+                  (item) => `
                 <tr>
-                  <th>Product</th>
-                  <th>Qty</th>
-                  <th>Rate</th>
-                  <th class="text-right">Total</th>
+                  <td>${item.name}</td>
+                  <td>${item.quantity}</td>
+                  <td>${item.price}</td>
+                  <td class="text-right">INR ${(
+                    item.quantity * item.price
+                  ).toFixed(2)}</td>
                 </tr>
-              </thead>
-              <tbody>
-                ${cart
-                  .map(
-                    (item) => `
-                  <tr>
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.price}</td>
-                    <td class="text-right">INR ${(
-                      item.quantity * item.price
-                    ).toFixed(2)}</td>
-                  </tr>
-                `
-                  )
-                  .join("")}
-              </tbody>
-            </table>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
+          <div class="flex justify-between items-center mt-8">
+            <div>
+              <p class="font-bold">Total</p>
+              <p class="font-bold">GST</p>
+              <p class="text-blue-600 font-bold text-xl">Grand Total</p>
+            </div>
+            <div class="text-right">
+              <p>INR ${cart
+                .reduce((acc, item) => acc + item.quantity * item.price, 0)
+                .toFixed(2)}</p>
+              <p>${(
+                cart.reduce(
+                  (acc, item) => acc + item.quantity * item.price,
+                  0
+                ) * 0.18
+              ).toFixed(2)}</p>
+              <p class="text-blue-600 font-bold text-xl">
+                ₹ ${(
+                  cart.reduce(
+                    (acc, item) => acc + item.quantity * item.price,
+                    0
+                  ) * 1.18
+                ).toFixed(2)}
+              </p>
+            </div>
           </div>
-          <div class="total">
-            <p>Total Amount: INR ${cart
-              .reduce((acc, item) => acc + item.quantity * item.price, 0)
-              .toFixed(2)}</p>
-          </div>
-          <div class="terms">
-            <p class="title">Terms and Conditions</p>
+          <p class="mt-8 text-gray-500">Valid until:
+            <span class="font-bold">${new Date(
+              Date.now() + 15 * 24 * 60 * 60 * 1000
+            ).toLocaleDateString()}</span>
+          </p>
+          <div class="mt-8 bg-gray-800 text-white p-4 rounded-md">
+            <p class="font-bold">Terms and Conditions</p>
             <p>We are happy to supply any further information you may need and trust that you call on us to fill your order, which will receive our prompt and careful attention.</p>
           </div>
         </div>
