@@ -1,11 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("cors"); // Allow anyone for the request
-const multer = require("multer"); // Allow image to be uploaded to the database
+const cors = require("cors");
+const multer = require("multer");
 const { Admin, Cart } = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const connectToDatabase = require("../db"); // Adjust the path as needed
+const connectToDatabase = require("../db");
+const puppeteer = require("puppeteer");
+const path = require("path");
+const fs = require("fs");
 
 connectToDatabase();
 
@@ -159,6 +162,152 @@ server.get("/cart/:email", async (req, res) => {
   }
 });
 
+// server.get("/generate-invoice", async (req, res) => {
+//   try {
+//     const browser = await puppeteer.launch({
+//       headless: true,
+//       args: ["--no-sandbox", "--disable-setuid-sandbox"],
+//     });
+//     const page = await browser.newPage();
+
+//     // Set a higher timeout
+//     await page.goto("http://localhost:5173/invoice", {
+//       waitUntil: "networkidle2",
+//       timeout: 60000, // 60 seconds
+//     });
+
+//     // Generate PDF
+//     const pdfBuffer = await page.pdf({
+//       format: "A4",
+//       printBackground: true,
+//     });
+
+//     await browser.close();
+
+//     res.set({
+//       "Content-Type": "application/pdf",
+//       "Content-Disposition": "attachment; filename=invoice.pdf",
+//     });
+
+//     res.send(pdfBuffer);
+//   } catch (error) {
+//     console.error("Error generating PDF:", error);
+//     res.status(500).send("Error generating PDF");
+//   }
+// });
+server.post("/generate-invoice", async (req, res) => {
+  try {
+    const { cart, userData } = req.body;
+
+    // Launch Puppeteer with increased timeout and error handling
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+    const page = await browser.newPage();
+
+    const invoiceContent = `
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+          .container { max-width: 960px; margin: auto; padding: 20px; }
+          .header { display: flex; justify-content: space-between; align-items: center; }
+          .header h1 { margin: 0; }
+          .header img { height: 40px; }
+          .invoice-details { margin-top: 20px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f2f2f2; }
+          .total { text-align: right; margin-top: 20px; }
+          .terms { margin-top: 20px; padding: 20px; background-color: #333; color: white; border-radius: 8px; }
+          .terms p { margin: 0; }
+          .terms .title { font-weight: bold; }
+          .text-right { text-align: right; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <div>
+              <h1>INVOICE</h1>
+            </div>
+            <div class="logo">
+              <img src="cid:logo.png" alt="levitation">
+              <div>
+                <h2>levitation</h2>
+                <p class="text-gray-500">infotech</p>
+              </div>
+            </div>
+          </div>
+          <div class="invoice-details">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Rate</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${cart
+                  .map(
+                    (item) => `
+                  <tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.price}</td>
+                    <td class="text-right">INR ${(
+                      item.quantity * item.price
+                    ).toFixed(2)}</td>
+                  </tr>
+                `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </div>
+          <div class="total">
+            <p>Total Amount: INR ${cart
+              .reduce((acc, item) => acc + item.quantity * item.price, 0)
+              .toFixed(2)}</p>
+          </div>
+          <div class="terms">
+            <p class="title">Terms and Conditions</p>
+            <p>We are happy to supply any further information you may need and trust that you call on us to fill your order, which will receive our prompt and careful attention.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await page.setContent(invoiceContent, { waitUntil: "networkidle0" });
+
+    // Add local image to PDF
+    const logoPath = path.resolve(__dirname, "../levi.png");
+    const logoBase64 = fs.readFileSync(logoPath, { encoding: "base64" });
+    const logoDataUri = `data:image/png;base64,${logoBase64}`;
+    await page.evaluate((logoDataUri) => {
+      document.querySelector("img[alt='levitation']").src = logoDataUri;
+    }, logoDataUri);
+
+    const pdfBuffer = await page.pdf({ format: "A4" });
+
+    await browser.close();
+
+    // Send PDF as response
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": 'attachment; filename="invoice.pdf"',
+    });
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    res.status(500).send("Error generating PDF");
+  }
+});
+
 server.get("/signup", async (req, res) => {
   const docs = await Admin.find();
   res.json(docs);
@@ -169,6 +318,6 @@ server.get("/", (req, res) => {
 });
 
 server.listen(3000, () => {
-  console.log("Server started on port 5173");
+  console.log("Server started on port 3000");
 });
 module.exports = server;
