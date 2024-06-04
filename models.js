@@ -13,7 +13,7 @@ const AdminSchema = new mongoose.Schema({
 });
 
 const cartSchema = new mongoose.Schema({
-  user: String,
+  email: String,
   name: String,
   price: String,
   quantity: String,

@@ -103,7 +103,7 @@ server.post("/login", async (req, res) => {
 });
 
 server.post("/cart", async (req, res) => {
-  const { user, name, quantity, price } = req.body;
+  const { email, name, quantity, price } = req.body;
   console.log(req.body);
   try {
     const existingCart = await Cart.findOne({ name });
@@ -111,7 +111,7 @@ server.post("/cart", async (req, res) => {
       return res.status(401).json({ message: "Item already exists in cart" });
     }
     const cart = new Cart({
-      user,
+      email,
       name,
       quantity,
       price,
