@@ -12,8 +12,11 @@ connectToDatabase();
 const server = express();
 
 server.use(bodyParser.json());
-server.use(cors());
-
+server.use(
+  cors({
+    origin: "https://levitation-eight.vercel.app",
+  })
+);
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -147,11 +150,11 @@ server.post("/cart", async (req, res) => {
     res.status(500).json({ error: "Error adding product to cart" });
   }
 });
-server.get("/cart/:user", async (req, res) => {
-  const { user } = req.params;
+server.get("/cart/:email", async (req, res) => {
+  const { email } = req.params;
   console.log(req.params);
   try {
-    const docs = await Cart.find({ user });
+    const docs = await Cart.find({ email });
     res.json(docs);
   } catch (error) {
     console.error("Error fetching cart:", error);
