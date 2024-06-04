@@ -146,6 +146,7 @@ server.post("/cart", async (req, res) => {
 //     res.status(500).json({ error: "Error adding product to cart" });
 //   }
 // });
+
 server.get("/cart/:email", async (req, res) => {
   const { email } = req.params;
   console.log(req.params);
