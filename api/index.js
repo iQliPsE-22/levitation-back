@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors"); // Allow anyone for the request
 const multer = require("multer"); // Allow image to be uploaded to the database
-const { Admin } = require("../models");
+const { Admin, Cart } = require("../models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const connectToDatabase = require("../db"); // Adjust the path as needed
@@ -103,7 +103,63 @@ server.post("/login", async (req, res) => {
   }
 });
 
-server.get("/admin", async (req, res) => {
+server.post("/cart", async (req, res) => {
+  const { user, name, quantity, price } = req.body;
+  console.log(req.body);
+  try {
+    const existingCart = await Cart.findOne({ name });
+    if (existingCart) {
+      return res.status(401).json({ message: "Item already exists in cart" });
+    }
+    const cart = new Cart({
+      user,
+      name,
+      quantity,
+      price,
+    });
+
+    await cart.save();
+    res.status(201).json({ message: "Added to cart successfully" });
+    console.log("Added to cart successfully");
+  } catch (error) {
+    res.status(500).json({ error: "Error adding to cart" });
+    console.log(error);
+  }
+});
+
+server.post("/cart", async (req, res) => {
+  const { user, name, quantity, price } = req.body;
+  try {
+    let cart = await Cart.findOne({ userId: user });
+    if (cart) {
+      cart.cart.push({ name, quantity, price });
+      await cart.save();
+    } else {
+      cart = new Cart({
+        userId: user,
+        cart: [{ name, quantity, price }],
+      });
+      await cart.save();
+    }
+    res.status(200).json({ message: "Product added to cart" });
+  } catch (error) {
+    console.error("Error adding product to cart:", error);
+    res.status(500).json({ error: "Error adding product to cart" });
+  }
+});
+server.get("/cart/:user", async (req, res) => {
+  const { user } = req.params;
+  console.log(req.params);
+  try {
+    const docs = await Cart.find({ user });
+    res.json(docs);
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ error: "Error fetching cart" });
+  }
+});
+
+server.get("/signup", async (req, res) => {
   const docs = await Admin.find();
   res.json(docs);
 });
@@ -113,6 +169,6 @@ server.get("/", (req, res) => {
 });
 
 server.listen(3000, () => {
-  console.log("Server started on port 3000");
+  console.log("Server started on port 5173");
 });
 module.exports = server;
