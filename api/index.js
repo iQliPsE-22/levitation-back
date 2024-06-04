@@ -12,11 +12,7 @@ connectToDatabase();
 const server = express();
 
 server.use(bodyParser.json());
-server.use(
-  cors({
-    origin: "https://levitation-eight.vercel.app", // replace with your frontend's URL
-  })
-);
+server.use(cors());
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -71,7 +67,7 @@ server.post("/signup", upload.single("profilePicture"), async (req, res) => {
   }
 });
 
-server.post("/login", cors(), async (req, res) => {
+server.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const admin = await Admin.findOne({ email });
@@ -130,26 +126,26 @@ server.post("/cart", async (req, res) => {
   }
 });
 
-server.post("/cart", async (req, res) => {
-  const { user, name, quantity, price } = req.body;
-  try {
-    let cart = await Cart.findOne({ userId: user });
-    if (cart) {
-      cart.cart.push({ name, quantity, price });
-      await cart.save();
-    } else {
-      cart = new Cart({
-        userId: user,
-        cart: [{ name, quantity, price }],
-      });
-      await cart.save();
-    }
-    res.status(200).json({ message: "Product added to cart" });
-  } catch (error) {
-    console.error("Error adding product to cart:", error);
-    res.status(500).json({ error: "Error adding product to cart" });
-  }
-});
+// server.post("/cart", async (req, res) => {
+//   const { user, name, quantity, price } = req.body;
+//   try {
+//     let cart = await Cart.findOne({ userId: user });
+//     if (cart) {
+//       cart.cart.push({ name, quantity, price });
+//       await cart.save();
+//     } else {
+//       cart = new Cart({
+//         userId: user,
+//         cart: [{ name, quantity, price }],
+//       });
+//       await cart.save();
+//     }
+//     res.status(200).json({ message: "Product added to cart" });
+//   } catch (error) {
+//     console.error("Error adding product to cart:", error);
+//     res.status(500).json({ error: "Error adding product to cart" });
+//   }
+// });
 server.get("/cart/:email", async (req, res) => {
   const { email } = req.params;
   console.log(req.params);
