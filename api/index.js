@@ -12,7 +12,11 @@ connectToDatabase();
 const server = express();
 
 server.use(bodyParser.json());
-server.use(cors());
+server.use(
+  cors({
+    origin: "https://levitation-eight.vercel.app", // replace with your frontend's URL
+  })
+);
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -67,7 +71,7 @@ server.post("/signup", upload.single("profilePicture"), async (req, res) => {
   }
 });
 
-server.post("/login", async (req, res) => {
+server.post("/login", cors(), async (req, res) => {
   try {
     const { email, password } = req.body;
     const admin = await Admin.findOne({ email });
