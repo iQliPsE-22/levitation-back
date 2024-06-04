@@ -12,11 +12,7 @@ connectToDatabase();
 const server = express();
 
 server.use(bodyParser.json());
-server.use(
-  cors({
-    origin: "https://levitation-eight.vercel.app",
-  })
-);
+server.use(cors());
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
