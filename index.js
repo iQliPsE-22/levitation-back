@@ -158,8 +158,8 @@ server.post("/generate-invoice", async (req, res) => {
       ],
       executablePath:
         process.env.NODE_ENV === "production"
-          ? puppeteer.executablePath()
-          : "C:\\Users\\deepa\\.cache\\puppeteer\\chrome\\win64-125.0.6422.78\\chrome-win64\\chrome.exe",
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
     });
     const page = await browser.newPage();
 
