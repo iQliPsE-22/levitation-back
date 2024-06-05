@@ -151,7 +151,9 @@ server.post("/generate-invoice", async (req, res) => {
     const browser = await puppeteer.launch({
       headless: true,
       executablePath:
-        "C:\\Users\\deepa\\.cache\\puppeteer\\chrome\\win64-125.0.6422.78\\chrome-win64\\chrome.exe",
+        process.env.NODE_ENV === "production"
+          ? puppeteer.executablePath()
+          : "C:\\Users\\deepa\\.cache\\puppeteer\\chrome\\win64-125.0.6422.78\\chrome-win64\\chrome.exe",
     });
     const page = await browser.newPage();
 
