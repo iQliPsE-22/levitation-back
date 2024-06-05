@@ -6,7 +6,7 @@ const { Admin, Cart } = require("./models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const connectToDatabase = require("./db");
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
 const path = require("path");
 const fs = require("fs");
 const chromium = require("chrome-aws-lambda");
@@ -146,11 +146,12 @@ server.post("/generate-invoice", async (req, res) => {
   try {
     const { cart } = req.body;
     const cartData = req.body;
-    chormpath = await chromium.executablePath;
-    console.log(chormpath);
+    chromePath = await chromium.executablePath;
+    console.log(chromePath);
     const browser = await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath:
+        "C:\\Users\\deepa\\.cache\\puppeteer\\chrome\\win64-125.0.6422.78\\chrome-win64\\chrome.exe",
     });
     const page = await browser.newPage();
 
