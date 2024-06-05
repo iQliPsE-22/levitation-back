@@ -6,10 +6,10 @@ const { Admin, Cart } = require("./models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const connectToDatabase = require("./db");
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
 const path = require("path");
 const fs = require("fs");
-
+const chromium = require("chrome-aws-lambda");
 connectToDatabase();
 
 const server = express();
