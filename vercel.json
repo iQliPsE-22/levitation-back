@@ -2,15 +2,21 @@
     "version": 2,
     "builds": [
       {
-        "src": "api/**/*.js",
+        "src": "api/index.js",
         "use": "@vercel/node"
       }
     ],
     "routes": [
       {
-        "src": "/(.*)",
+        "src": "/generate-invoice",
         "dest": "/api/index.js"
       }
-    ]
+    ],
+    "build": {
+      "env": {
+        "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true"
+      },
+      "postinstall": "npm install puppeteer"
+    }
   }
   
