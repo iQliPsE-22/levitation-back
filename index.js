@@ -10,7 +10,7 @@ const puppeteer = require("puppeteer-core");
 const path = require("path");
 const fs = require("fs");
 const chromium = require("chrome-aws-lambda");
-
+require("dotenv").config();
 connectToDatabase();
 
 const server = express();
@@ -150,6 +150,12 @@ server.post("/generate-invoice", async (req, res) => {
     console.log(chromePath);
     const browser = await puppeteer.launch({
       headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--single-process",
+        "--no-zygote",
+      ],
       executablePath:
         process.env.NODE_ENV === "production"
           ? puppeteer.executablePath()
