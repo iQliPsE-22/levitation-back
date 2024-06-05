@@ -144,6 +144,7 @@ server.get("/cart/:email", async (req, res) => {
 
 server.post("/generate-invoice", async (req, res) => {
   try {
+    console.log("Request body:", req.body);
     const { cart } = req.body;
     const cartData = req.body;
     const chromePath = process.env.PUPPETEER_EXECUTABLE_PATH;
