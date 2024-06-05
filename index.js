@@ -146,8 +146,9 @@ server.post("/generate-invoice", async (req, res) => {
   try {
     const { cart } = req.body;
     const cartData = req.body;
-    chromePath = await chromium.executablePath;
-    console.log(chromePath);
+    const chromePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+    console.log("PUPPETEER_EXECUTABLE_PATH:", chromePath);
+    console.log(puppeteer.executablePath());
     const browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -156,10 +157,10 @@ server.post("/generate-invoice", async (req, res) => {
         "--single-process",
         "--no-zygote",
       ],
-      executablePath:
-        process.env.NODE_ENV === "production"
-          ? process.env.PUPPETEER_EXECUTABLE_PATH
-          : puppeteer.executablePath(),
+      executablePath: chromePath,
+      // process.env.NODE_ENV === "production"
+      //   ? process.env.PUPPETEER_EXECUTABLE_PATH
+      //   : puppeteer.executablePath(),
     });
     const page = await browser.newPage();
 
