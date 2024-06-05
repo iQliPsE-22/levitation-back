@@ -153,7 +153,7 @@ server.post("/generate-invoice", async (req, res) => {
 
     const browser = await chromium.puppeteer.launch({
       headless: true,
-      executablePath: chromePath,
+      executablePath: "/usr/bin/google-chrome-stable",
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
       ignoreHTTPSErrors: true,
