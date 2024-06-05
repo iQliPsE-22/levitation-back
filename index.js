@@ -146,15 +146,12 @@ server.post("/generate-invoice", async (req, res) => {
     const { cart } = req.body;
     const cartData = req.body;
     console.log(cartData);
-    const browser = await puppeteer.launch({
+    const browser = await chromium.puppeteer.launch({
       headless: true,
-      executablePath: "/usr/bin/google-chrome-stable", // Specify the path to Chrome
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-      ],
+      executablePath: await chromium.executablePath,
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      ignoreHTTPSErrors: true,
     });
     const page = await browser.newPage();
 
