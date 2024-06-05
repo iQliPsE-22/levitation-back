@@ -148,7 +148,13 @@ server.post("/generate-invoice", async (req, res) => {
     console.log(cartData);
     const browser = await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: "/usr/bin/google-chrome-stable", // Specify the path to Chrome
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+      ],
     });
     const page = await browser.newPage();
 
@@ -292,7 +298,7 @@ server.get("/signup", async (req, res) => {
 });
 
 server.get("/", (req, res) => {
-  res.send("<h1>Server is running</h1>");
+  res.send("<h1>Levitation Server is running</h1>");
 });
 
 server.listen(3000, () => {
