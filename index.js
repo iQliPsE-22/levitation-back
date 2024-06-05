@@ -146,9 +146,14 @@ server.post("/generate-invoice", async (req, res) => {
     const { cart } = req.body;
     const cartData = req.body;
     console.log(cartData);
+    const chromePath = await chromium.executablePath;
+    if (!chromePath) {
+      throw new Error("Chrome executable path is not found");
+    }
+
     const browser = await chromium.puppeteer.launch({
       headless: true,
-      executablePath: await chromium.executablePath,
+      executablePath: chromePath,
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
       ignoreHTTPSErrors: true,
