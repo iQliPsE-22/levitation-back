@@ -6,10 +6,11 @@ const { Admin, Cart } = require("./models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const connectToDatabase = require("./db");
-const puppeteer = require("puppeteer-core");
+const puppeteer = require("puppeteer");
 const path = require("path");
 const fs = require("fs");
 const chromium = require("chrome-aws-lambda");
+
 connectToDatabase();
 
 const server = express();
@@ -145,22 +146,12 @@ server.post("/generate-invoice", async (req, res) => {
   try {
     const { cart } = req.body;
     const cartData = req.body;
-    console.log(cartData);
-
-    const executablePath = await chromium.executablePath;
-    console.log("Chrome executable path:", executablePath);
-    chromium.args = [
-      ...chromium.args,
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-gpu',
-    ];
-    const browser = await chromium.puppeteer.launch({
+    chormpath = await chromium.executablePath;
+    console.log(chormpath);
+    const browser = await puppeteer.launch({
       headless: true,
-      args: chromium.args,
-      executablePath: await chromium.executablePath,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
-
     const page = await browser.newPage();
 
     const invoiceContent = `
@@ -296,7 +287,6 @@ server.post("/generate-invoice", async (req, res) => {
     res.status(500).send("Error generating PDF");
   }
 });
-
 server.get("/signup", async (req, res) => {
   const docs = await Admin.find();
   res.json(docs);
