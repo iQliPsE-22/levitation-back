@@ -149,7 +149,12 @@ server.post("/generate-invoice", async (req, res) => {
 
     const executablePath = await chromium.executablePath;
     console.log("Chrome executable path:", executablePath);
-
+    chromium.args = [
+      ...chromium.args,
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-gpu',
+    ];
     const browser = await chromium.puppeteer.launch({
       headless: true,
       args: chromium.args,
